@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planogram AI Engine — FamilyMart Indonesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00843D;
+  --green-light: #00A84F;
+  --green-pale: #E8F5EE;
+  --green-dim: #D0EDDA;
+  --red: #D32F2F;
+  --red-pale: #FEECEC;
+  --amber: #B45309;
+  --amber-pale: #FEF3CD;
+  --blue: #1565C0;
+  --blue-pale: #E8F0FE;
+  --pink: #9C27B0;
+  --pink-pale: #F3E5F5;
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #CED4DA;
+  --gray-500: #ADB5BD;
+  --gray-600: #6C757D;
+  --gray-700: #495057;
+  --gray-800: #343A40;
+  --gray-900: #212529;
+  --surface: #FFFFFF;
+  --bg: #F4F6F4;
+  --border: #E0E7E0;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+code, .mono { font-family: 'DM Mono', monospace; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--gray-900);
+}
+.fm-badge {
+  background: var(--green);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.topbar-nav { display: flex; gap: 6px; align-items: center; }
+.nav-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--gray-700);
+  transition: all 0.15s;
+}
+.nav-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+.nav-btn.active { background: var(--green-pale); color: var(--green); border-color: var(--green-dim); font-weight: 500; }
+.nav-btn.primary {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+  font-weight: 500;
+}
+.nav-btn.primary:hover { background: var(--green-light); }
+
+/* ── LAYOUT ── */
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card-sm { padding: 14px 16px; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #003d1c 0%, #00572a 50%, #006b34 100%);
+  border-radius: var(--radius-lg);
+  padding: 40px 40px 36px;
+  color: white;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 220px; height: 220px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 30%;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50%;
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+.hero h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+.hero p { font-size: 15px; opacity: 0.8; max-width: 540px; margin-bottom: 24px; }
+.hero-stats { display: flex; gap: 32px; }
+.hero-stat span { display: block; }
+.hero-stat .num { font-size: 26px; font-weight: 700; }
+.hero-stat .lbl { font-size: 12px; opacity: 0.65; margin-top: -2px; }
+.hero-actions { display: flex; gap: 10px; margin-top: 24px; }
+.hero-btn {
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.hero-btn.white { background: white; color: var(--green); }
+.hero-btn.white:hover { background: #f0f0f0; }
+.hero-btn.outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.4); }
+.hero-btn.outline:hover { background: rgba(255,255,255,0.1); }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+
+/* ── SECTION LABELS ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+/* ── TAGS / BADGES ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.tag-green { background: var(--green-pale); color: var(--green); }
+.tag-red { background: var(--red-pale); color: var(--red); }
+.tag-amber { background: var(--amber-pale); color: var(--amber); }
+.tag-blue { background: var(--blue-pale); color: var(--blue); }
+.tag-gray { background: var(--gray-100); color: var(--gray-600); }
+.tag-purple { background: var(--pink-pale); color: var(--pink); }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-pale); color: var(--green); }
+.badge-red { background: var(--red-pale); color: var(--red); }
+.badge-amber { background: var(--amber-pale); color: var(--amber); }
+.badge-blue { background: var(--blue-pale); color: var(--blue); }
+
+/* ── FORMS ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--gray-700); margin-bottom: 5px; display: block; }
+.form-select, .form-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--gray-900);
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,132,61,0.1);
+}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--green); background: var(--green-pale); }
+.upload-zone.has-file { border-color: var(--green); background: var(--green-pale); border-style: solid; }
+.upload-zone input[type=file] { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--gray-500); }
+
+/* ── STEP WIZARD ── */
+.wizard { display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px; }
+.wizard-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.wizard-step::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 1.5px;
+  background: var(--border);
+}
+.wizard-step:last-child::after { display: none; }
+.wdot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  z-index: 1;
+  transition: all 0.2s;
+}
+.wdot.idle { background: var(--gray-100); color: var(--gray-500); border: 1.5px solid var(--border); }
+.wdot.active { background: var(--green-pale); color: var(--green); border: 2px solid var(--green); }
+.wdot.done { background: var(--green); color: white; border: 2px solid var(--green); }
+.wlabel { font-size: 11px; color: var(--gray-500); margin-top: 6px; text-align: center; font-weight: 500; }
+.wlabel.active { color: var(--green); }
+.wizard-step.active::after { background: var(--green-dim); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+.btn-primary { background: var(--green); color: white; border-color: var(--green); }
+.btn-primary:hover { background: var(--green-light); border-color: var(--green-light); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { background: var(--red-pale); color: var(--red); border-color: #F5C6C6; }
+.btn-danger:hover { background: #FDD; }
+
+/* ── SHELF GRID ── */
+.shelf-section { margin-bottom: 10px; }
+.shelf-row-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-500);
+  padding: 4px 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shelf-slots {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.slot {
+  min-width: 74px;
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 5px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--gray-600);
+  background: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  line-height: 1.3;
+  gap: 2px;
+  transition: all 0.15s;
+}
+.slot-num { font-size: 9px; color: var(--gray-400); font-weight: 600; }
+.slot.correct { background: #F0FBF4; border-color: #86EFAC; color: #166534; }
+.slot.missing { background: var(--red-pale); border-color: #FCA5A5; border-style: dashed; color: var(--red); }
+.slot.misplaced { background: #FDF2F8; border-color: #F9A8D4; color: #86198F; }
+.slot.unexpected { background: var(--amber-pale); border-color: #FCD34D; color: var(--amber); }
+.slot-status { font-size: 9px; font-weight: 700; }
+
+/* ── ANALYSIS STREAM ── */
+.stream-box {
+  background: var(--gray-900);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  color: #86EFAC;
+  line-height: 1.7;
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.stream-box .dim { color: #6B7280; }
+.stream-box .highlight { color: #FCD34D; }
+.stream-box .err { color: #FCA5A5; }
+
+/* ── PROGRESS ── */
+.progress-track {
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--green);
+  transition: width 0.4s ease;
+}
+
+/* ── ANALYSIS STEPS ── */
+.a-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--gray-500);
+  border-bottom: 1px solid var(--gray-100);
+}
+.a-step:last-child { border-bottom: none; }
+.a-step.done { color: var(--gray-700); }
+.a-step.active { color: var(--green); font-weight: 500; }
+.a-step-icon { font-size: 14px; width: 20px; text-align: center; }
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-anim 1s ease-in-out infinite;
+}
+@keyframes pulse-anim { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+/* ── RESULT ── */
+.score-circle {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.score-circle .score-num { font-size: 28px; line-height: 1; }
+.score-circle .score-lbl { font-size: 10px; font-weight: 500; margin-top: 2px; }
+.issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.issue-item:last-child { border-bottom: none; }
+.issue-dot {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.metric-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.metric-num { font-size: 24px; font-weight: 700; margin-top: 2px; }
+.metric-lbl { font-size: 11px; color: var(--gray-500); }
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: var(--gray-900);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #D1D5DB;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* ── PLANOGRAM LIBRARY ── */
+.plan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.plan-card:hover { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,132,61,0.08); }
+.plan-card.selected { border-color: var(--green); background: var(--green-pale); box-shadow: 0 0 0 3px rgba(0,132,61,0.1); }
+.plan-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.plan-card-name { font-weight: 600; font-size: 13px; }
+.plan-card-meta { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.plan-check { display: none; }
+.plan-card.selected .plan-check { display: flex; }
+
+/* ── UPLOAD PAGE ── */
+.pdf-upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pdf-upload-zone:hover { border-color: var(--green); background: var(--green-pale); }
+.pdf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: all 0.15s;
+}
+.pdf-item:hover { border-color: var(--gray-400); }
+.pdf-icon { font-size: 22px; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── FLOW DIAGRAM ── */
+.flow { display: flex; align-items: center; gap: 0; margin: 16px 0; overflow-x: auto; padding: 8px 0; }
+.flow-node {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+.flow-arrow { color: var(--gray-400); font-size: 18px; padding: 0 4px; flex-shrink: 0; }
+.flow-node.green { background: var(--green-pale); border-color: var(--green-dim); color: var(--green); }
+.flow-node.blue { background: var(--blue-pale); border-color: #BFDBFE; color: var(--blue); }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 2px; background: var(--gray-100); border-radius: 10px; padding: 3px; margin-bottom: 16px; }
+.tab {
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-600);
+  transition: all 0.15s;
+  text-align: center;
+}
+.tab.active { background: white; color: var(--gray-900); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ── NOTIFICATION BANNER ── */
+.banner {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.banner-green { background: var(--green-pale); color: #14532D; border: 1px solid var(--green-dim); }
+.banner-amber { background: var(--amber-pale); color: #78350F; border: 1px solid #FDE68A; }
+.banner-red { background: var(--red-pale); color: #7F1D1D; border: 1px solid #FECACA; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .hero { padding: 24px 20px; }
+  .hero h1 { font-size: 22px; }
+  .hero-stats { gap: 20px; }
+  .hero-actions { flex-direction: column; }
+  .topbar { padding: 0 14px; }
+  .main { padding: 16px 12px; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<nav class="topbar">
+  <div class="topbar-logo">
+    <span class="fm-badge">FamilyMart</span>
+    <span>Planogram AI Engine</span>
+    <span style="font-size:11px; color:var(--gray-500); font-weight:400;">Indonesia</span>
+  </div>
+  <div class="topbar-nav">
+    <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showPage('check')">Check Shelf</button>
+    <button class="nav-btn" onclick="showPage('library')">Planograms</button>
+    <button class="nav-btn primary" onclick="showPage('upload')">+ Upload PDF</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="hero">
+      <div class="hero-tag">🤖 AI-powered compliance checking</div>
+      <h1>Planogram Compliance,<br>automated.</h1>
+      <p>Upload a shelf photo, pick your planogram zone, and the AI instantly tells you what's correct, missing, misplaced, or unexpected — no manual checking needed.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="num">2</span><span class="lbl">Planograms loaded</span></div>
+        <div class="hero-stat"><span class="num">158</span><span class="lbl">Product slots mapped</span></div>
+        <div class="hero-stat"><span class="num">claude-sonnet-4</span><span class="lbl">Vision model</span></div>
+      </div>
+      <div class="hero-actions">
+        <button class="hero-btn white" onclick="showPage('check')">▶ Start Shelf Check</button>
+        <button class="hero-btn outline" onclick="showPage('library')">View Planogram Library</button>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:20px;">
+      <div class="card card-sm">
+        <div class="section-label">How it works</div>
+        <div class="flow" style="flex-direction:column; align-items:flex-start; gap:0;">
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Supervisor takes shelf photo</div>
+              <div style="font-size:11px;color:var(--gray-500);">Via FamilyLink app in-store</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Selects planogram zone</div>
+              <div style="font-size:11px;color:var(--gray-500);">From uploaded PDF library</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Claude Vision analyzes</div>
+              <div style="font-size:11px;color:var(--gray-500);">Reads product labels from photo</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green-pale);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:1.5px solid var(--green);">4</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Returns compliance result</div>
+              <div style="font-size:11px;color:var(--gray-500);">JSON score + issue breakdown</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="section-label">Why not YOLOv8?</div>
+        <div style="font-size:12px; line-height:1.8; color:var(--gray-700);">
+          <div style="margin-bottom:8px;">✅ <strong>No training data needed</strong> — Claude Vision reads text on packaging directly. No labeling 100-200 photos.</div>
+          <div style="margin-bottom:8px;">✅ <strong>Works immediately</strong> — drop in a new planogram PDF and it works. YOLO requires retraining.</div>
+          <div style="margin-bottom:8px;">✅ <strong>Supervisor photos are focused</strong> — one shelf section per shot, no crowd detection needed.</div>
+          <div>⚠️ <strong>YOLOv8 is Phase 2</strong> — for wide-angle store scans in the future.</div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="section-label">API endpoint</div>
+        <div class="code-block">POST /check
+Content-Type: application/json
+
+{
+  "planogram_id": "SNACK3C-COL1",
+  "store_id": "FM-CIBUBUR-001",
+  "image": "[base64 JPG]"
+}
+
+→ Response:
+{
+  "status": "fail",
+  "compliance_score": 83,
+  "issues": [...],
+  "correct": [...],
+  "summary": "..."
+}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="section-label" style="margin-bottom:14px;">Loaded planograms</div>
+      <div class="grid-3">
+        <div class="plan-card" onclick="showPage('check')">
+          <div class="plan-card-header">
+            <div>
+              <div class="plan-card-name">SNACK3C</div>
+              <div class="plan-card-meta">Snack section — 3 columns</div>
+            </div>
+            <span class="badge badge-green">Active</span>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:8px;">
+            <span class="tag tag-gray">101 products</span>
+            <span class="tag tag-blue">6 rows/col</span>
+            <span class="tag tag-gray">1 Apr 2026</span>
+          </div>
+        </div>
+        <div class="plan-card" onclick="showPage('check')">
+          <div class="plan-card-header">
+            <div>
+              <div class="plan-card-name">BISCUIT5H</div>
+              <div class="plan-card-meta">Biscuit section — 5 columns</div>
+            </div>
+            <span class="badge badge-green">Active</span>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:8px;">
+            <span class="tag tag-gray">159 products</span>
+            <span class="tag tag-blue">8 rows/col</span>
+            <span class="tag tag-gray">17 Mar 2026</span>
+          </div>
+        </div>
+        <div class="plan-card" onclick="showPage('upload')" style="border-style:dashed; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; min-height:90px; color:var(--gray-400);">
+          <div style="font-size:24px;">+</div>
+          <div style="font-size:12px; font-weight:500;">Upload new planogram PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHECK SHELF ══ -->
+  <div class="page" id="page-check">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:18px; font-weight:600;">Shelf Compliance Check</h2>
+        <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">Upload a shelf photo and select the planogram zone to analyze</p>
+      </div>
+    </div>
+
+    <div class="wizard" id="checkWizard">
+      <div class="wizard-step active" id="ws1"><div class="wdot active" id="wd1">1</div><div class="wlabel active" id="wl1">Select zone</div></div>
+      <div class="wizard-step" id="ws2"><div class="wdot idle" id="wd2">2</div><div class="wlabel" id="wl2">Upload photo</div></div>
+      <div class="wizard-step" id="ws3"><div class="wdot idle" id="wd3">3</div><div class="wlabel" id="wl3">AI analysis</div></div>
+      <div class="wizard-step" id="ws4"><div class="wdot idle" id="wd4">4</div><div class="wlabel" id="wl4">Result</div></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="cs1" class="fade-in">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">Store & zone</div>
+          <div class="form-group">
+            <label class="form-label">Store ID</label>
+            <select class="form-select" id="storeSelect">
+              <option>FM-CIBUBUR-001</option>
+              <option>FM-KELAPA-GADING-012</option>
+              <option>FM-SUDIRMAN-007</option>
+              <option>FM-BEKASI-TIMUR-021</option>
+              <option>FM-TANGERANG-SELATAN-033</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Planogram zone</label>
+            <select class="form-select" id="zoneSelect" onchange="updateZonePreview()">
+              <optgroup label="SNACK3C.pdf">
+                <option value="snack_1">SNACK3C — Column 1 (Premium chips: Pringles, Chitato, Qtela)</option>
+                <option value="snack_2">SNACK3C — Column 2 (Potabee, Japota, Chiki, Guribee)</option>
+                <option value="snack_3">SNACK3C — Column 3 (Nuts, Garuda, Mayasi, Corn snacks)</option>
+              </optgroup>
+              <optgroup label="BISCUIT5H.pdf">
+                <option value="biscuit_1">BISCUIT5H — Col 1 (Oreo, Regal, Milo, Roma)</option>
+                <option value="biscuit_2">BISCUIT5H — Col 2 (Good Time, Monde, ATB Marie)</option>
+                <option value="biscuit_3">BISCUIT5H — Col 3 (Astor, Tango, Nabati Wafer)</option>
+                <option value="biscuit_5">BISCUIT5H — Col 5 (Pocky, Hello Panda, Lemonilo)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-label">Planogram reference — <span id="zoneId">SNACK3C-COL1</span></div>
+          <div id="refPreview" style="max-height:280px; overflow-y:auto;"></div>
+          <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;" id="refMeta"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="goCheckStep(2)">Continue → Upload photo</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="cs2" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">Shelf photo</div>
+          <div class="upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+            <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+            <div id="photoZoneContent">
+              <div class="upload-icon">📷</div>
+              <div class="upload-title">Upload shelf photo</div>
+              <div class="upload-sub">JPG or PNG · Photo taken in-store by supervisor</div>
+            </div>
+          </div>
+          <div id="photoInfo" style="display:none; margin-top:8px;"></div>
+          <hr class="divider">
+          <div class="section-label">Photo guidelines</div>
+          <div style="font-size:12px; color:var(--gray-600); line-height:1.9;">
+            ✅ Stand directly in front of the shelf section<br>
+            ✅ Fill the entire frame with one zone only<br>
+            ✅ Hold camera perpendicular — not angled<br>
+            ✅ Shoot at mid-shelf height<br>
+            ✅ Avoid glare, blur, or customers in frame<br>
+            ✅ One photo = one planogram zone
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-label">API request preview</div>
+          <div class="code-block" id="apiPreview"></div>
+          <hr class="divider">
+          <div class="section-label">Selected zone</div>
+          <div id="selectedZoneTag" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:8px;">
+        <button class="btn" onclick="goCheckStep(1)">← Back</button>
+        <button class="btn btn-primary" id="analyzeBtn" onclick="goCheckStep(3)" disabled>Analyze with Claude Vision →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="cs3" style="display:none;">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;" id="aiAvatar">🤖</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">claude-sonnet-4 · Vision + Text</div>
+            <div style="font-size:12px;color:var(--gray-500);" id="aiStatusText">Initializing…</div>
+          </div>
+          <span class="badge" id="aiBadge" style="background:var(--blue-pale);color:var(--blue);">
+            <span class="pulse-dot" style="margin-right:5px;"></span>Processing
+          </span>
+        </div>
+        <div id="analysisSteps"></div>
+        <div style="margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray-500);">
+            <span>Analysis progress</span><span id="pctLabel">0%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Claude reasoning</div>
+        <div class="stream-box" id="streamBox"></div>
+      </div>
+    </div>
+
+    <!-- Step 4 (Result) -->
+    <div id="cs4" style="display:none;">
+      <div id="resultContent"></div>
+      <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn" onclick="resetCheck()">← New check</button>
+        <button class="btn btn-primary" onclick="showPage('library')">View all planograms</button>
+        <button class="btn" onclick="showPage('upload')">Upload new PDF</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PLANOGRAM LIBRARY ══ -->
+  <div class="page" id="page-library">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:18px; font-weight:600;">Planogram Library</h2>
+        <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">All uploaded planogram PDFs and their shelf zones</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('upload')">+ Upload PDF</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchLibTab('snack')">SNACK3C (snack section)</button>
+      <button class="tab" onclick="switchLibTab('biscuit')">BISCUIT5H (biscuit section)</button>
+    </div>
+
+    <div id="libSnack">
+      <div class="banner banner-green">📄 SNACK3C.pdf · Date 01 April 2026 · 101 products across 3 columns</div>
+      <div id="libSnackContent"></div>
+    </div>
+    <div id="libBiscuit" style="display:none;">
+      <div class="banner banner-green">📄 BISCUIT5H.pdf · Date 17 Maret 2026 · 159 products across 5 columns</div>
+      <div id="libBiscuitContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ UPLOAD PDF ══ -->
+  <div class="page" id="page-upload">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px; font-weight:600;">Upload Planogram PDF</h2>
+      <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">Add new planogram PDFs from the Spaceman system. They become immediately available for shelf checking.</p>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="section-label">Upload new PDF</div>
+          <div class="pdf-upload-zone" onclick="document.getElementById('pdfInput').click()" id="pdfDropZone">
+            <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfUpload(event)">
+            <div style="font-size:36px; margin-bottom:10px;">📄</div>
+            <div style="font-size:14px; font-weight:500; margin-bottom:4px;">Click to upload planogram PDF</div>
+            <div style="font-size:12px; color:var(--gray-500);">Exported from Spaceman software · PDF format</div>
+          </div>
+          <div id="uploadStatus" style="display:none; margin-top:12px;"></div>
+          <div id="uploadForm" style="display:none; margin-top:14px;">
+            <div class="form-group">
+              <label class="form-label">Zone label (e.g. SNACK3C, BISCUIT5H)</label>
+              <input class="form-input" id="pdfLabel" placeholder="e.g. DAIRY1A">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="pdfCategory">
+                <option>Snack</option>
+                <option>Biscuit</option>
+                <option>Beverage</option>
+                <option>Dairy</option>
+                <option>Confectionery</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="confirmPdfUpload()">✓ Add to library</button>
+          </div>
+        </div>
+
+        <div class="card card-sm">
+          <div class="section-label">What happens after upload</div>
+          <div style="font-size:12px; color:var(--gray-600); line-height:2.0;">
+            <div>1. PDF is stored in <code>/planograms/</code> folder</div>
+            <div>2. PyMuPDF extracts the shelf image page</div>
+            <div>3. Product positions parsed from PDF text layer</div>
+            <div>4. Zone becomes available in shelf check selector</div>
+            <div>5. Supervisors are notified via FamilyLink</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Current planogram files</div>
+        <div id="pdfList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════
+//   PLANOGRAM DATA (real from PDFs)
+// ═══════════════════════════════════
+const PLANS = {
+  snack_1: {
+    id:"SNACK3C-COL1", label:"SNACK3C — Column 1", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 1.1", h:"140cm", slots:["Pringles Original 102g","PotatoQ Rumput Laut 50g","PotatoQ Sosis Meksiko 50g","Chitato Lite Sour Cream 68g","Chitato Lite Nori 65g","Chitato Lite Aburi 65g","Chitato Sapi Panggang 168g"]},
+      {id:"SNACK 1.2", h:"120cm", slots:["Lays Seaweed 64g","Chitato Lite Ayam Bawang 65g","Chitato Mi Goreng 65g","Chitato Original 68g","Chitato Ayam Bumbu 65g","Chitato Sapi BBQ 65g"]},
+      {id:"SNACK 1.3", h:"100cm", slots:["Qtela Tempe Cabe Rawit 55g","Qtela Tempe Rumput Laut 55g","Roni Makaroni RoastCorn 135g","Roni Makaroni Ex Spicy 135g","Boncabe Kulit Pangsit 70g","Boncabe Makaroni Krispi 135g"]},
+      {id:"SNACK 1.4", h:"80cm", slots:["Taro Tempe Chicken Onion 50g","Taro Tempe Himalayan Salt 50g","Kusuka Ubimix Honey 40g","Kusuka Singkong BBQ 60g","Kusuka Singkong Ayam Lada 60g","Kusuka Singkong Super Pedas 50g"]},
+      {id:"SNACK 1.5", h:"60cm", slots:["Chuba Keripik Singkong Keju 125g","Chuba Cassava Sambal Balado 125g","Qtela Balado 175g","Kusuka Singkong Original 180g","Kusuka Singkong Barbeque 180g"]},
+      {id:"SNACK 1.6", h:"20cm", slots:["Maxicorn Nacho Cheese 140g","Maxicorn Roasted Corn 140g","Happytos Hijau Tortilla 140g","Happytos Merah Corn 140g","Tos Tos Korean BBQ 140g","Tos Tos Nacho Cheese 140g"]},
+    ]
+  },
+  snack_2: {
+    id:"SNACK3C-COL2", label:"SNACK3C — Column 2", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 2.1", h:"140cm", slots:["Potabee BBQ 65g","Potabee Wagyu Beef 65g","Potabee Seaweed 65g","Japota Umami Seaweed 68g","GuriBee Rumput Laut 65g"]},
+      {id:"SNACK 2.2", h:"120cm", slots:["GuriBee BBQ Balado 65g","Potabee Salted Egg 68g","Potabee Ayam Bakar 68g","Japota Nipis Pedas 68g","Japota Honey Butter 68g","Japota Original 68g"]},
+      {id:"SNACK 1.7", h:"100cm", slots:["Guribee Layers Keju Krispi 65g","Piattos Big & Crispy 68g","Piattos Sapi Panggang 65g","Siantar Top French Fries 62g","Siantar Top French Fries 130g"]},
+      {id:"SNACK 2.3", h:"80cm", slots:["Chiki Twist Roasted Corn 75g","Chiki Twist Flaming Hot 75g","Chiki Twist Keju Duo 70g","Chiki Twist Jagung Bakar 65g","Twistko Snack Jagung Bakar 70g","Siantar Top French Fries Lv3 60g"]},
+      {id:"SNACK 2.4", h:"60cm", slots:["Chiki Puffs Cheddar Cheese 60g","Oishi Rin Bee Keju 60g","Oishi Rasa Udang Pedas 60g","Taro Net Seaweed 62g","Jetz Choco Fiesta 65g","Smax Ring Rasa Keju 40g"]},
+      {id:"SNACK 2.5", h:"20cm", slots:["Mr.Hottest Maitos Sambal Balado 140g","Chiki Balls Cheese 55g","Chiki Balls Kaldu Ayam 50g","Chiki Balls Coklat 50g","Momogi Star Bite Chocolate 50g","Momogi Mini Stick Roasted Corn 50g"]},
+    ]
+  },
+  snack_3: {
+    id:"SNACK3C-COL3", label:"SNACK3C — Column 3", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 3.1", h:"140cm", slots:["Gemez Mie Enaak 22g","Spix Soba Mie Chicken 21g","Spix Mie Goreng 50g","Mie Kremezz Mie Goreng 30g","Lidi Geli Spicy 50g","Dua Kelinci Mix Nuts 60g"]},
+      {id:"SNACK 3.2", h:"120cm", slots:["Mayasi Kacang Jepang Pedas 65g","Mayasi Koro Pedas 65g","Mayasi Kacang Jepang Garlic 65g","Tic Tac Mi Goreng 80g","Tic Tac Mix 80g"]},
+      {id:"SNACK 3.3", h:"100cm", slots:["Garuda Pilus Mie Goreng 80g","Garuda Pilus Pedas 80g","Garuda Pilus Sapi Panggang 80g","Tic Tac Sapi Panggang 80g"]},
+      {id:"SNACK 3.4", h:"80cm", slots:["Garuda Rosta Kac Panggang Pedas 95g","Garuda Rosta Kac Panggang Bawang 100g","Dua Kelinci Sukro Oven Bawang 95g","Garuda Kacang Atom Original 100g","Dua Kelinci Sukro 95g"]},
+      {id:"SNACK 3.5", h:"60cm", slots:["Garuda Kacang Kulit 160g","Dua Kelinci Kuaci Fuzo Original 140g","Rebo Kuaci Original 120g","Mamasuka Rumput Laut 2X4.5g","Mamasuka Rumput Laut Pedas 2X4.5g"]},
+      {id:"SNACK 3.6", h:"20cm", slots:["Wonhae Topokki Snack Creamy Rose 80g","Cem Cem Corn Shot Ayam Goreng 55g","Cem Cem Corn Shot Cokelat 55g","Cem Cem Pop Corn Chocolate 55g","Oishi Pillows Coklat 100g","Oishi Sponge Crunch Coklat 100g"]},
+    ]
+  },
+  biscuit_1: {
+    id:"BISCUIT5H-COL1", label:"BISCUIT5H — Column 1", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 1.1", h:"140cm", slots:["Oreo Chocolate 105g","Oreo Vanilla 105g","Oreo Dark & White Choco 105g","Oreo Mini Vanilla Pck 58g"]},
+      {id:"BISCUIT 1.2", h:"120cm", slots:["Regal Marie Duo Chocolate 100g","Regal Marie Duo Peanut Butter 100g","Serena Togo Long Choc Sandwich 128g","Serena Togo Long Rasa Kacang 128g"]},
+      {id:"BISCUIT 1.3", h:"100cm", slots:["Kokola Kukis Black 110g","Ovaltine Choc Malt Cookies 104g","Milo Biscuit Activ Original 104g","Milo Biscuit Activ Milk 104g"]},
+      {id:"BISCUIT 1.4", h:"80cm", slots:["Roma Sari Gandum Coklat 108g","Roma Sari Gandum Peanut Butter 108g","Julies Choco More Sandwich 99g","Julies Peanut Butter Sandwich 82g"]},
+      {id:"BISCUIT 1.5", h:"60cm", slots:["Biskies Choco Crm 96g","Biskies Cheese Crm 96g","Franzzi Dark Choco Cookies 70g","Franzzi Cheese Choco Cookies 70g"]},
+      {id:"BISCUIT 1.6", h:"40cm", slots:["Roma Slai Olai Strawberry 128g","Roma Slai Olai Blueberry 128g","Imperial Creame Rasberry 108g","Imperial Creame Bluberry 108g"]},
+      {id:"BISCUIT 1.7", h:"20cm", slots:["Unibis Bon Bon Chocolate 200g","Ritz Cheese 91g","Biskies Oat Gandum Kurma 108g","Better Sandwich Biscuit Vanila 100g"]},
+      {id:"BISCUIT 1.8", h:"0cm", slots:["Khong Guan Superco Coklat 138g","Monde Bourbon Chocolate 140g","Unibis Chocolate Short Cake 205g","Roma Sandwichi Chocolate 189g"]},
+    ]
+  },
+  biscuit_2: {
+    id:"BISCUIT5H-COL2", label:"BISCUIT5H — Column 2", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 2.1", h:"140cm", slots:["Good Time Mini Double Choc 50g","WRP Keju Edam Cheese Cookies 30g","Choco Mania ChocoChips&Cheese 69g","Roma Slai Olai Triple Fun 80g","Better FunBites Pouch 100g","Monde Pie Bis 190g"]},
+      {id:"BISCUIT 2.2", h:"120cm", slots:["Good Time Classic Chocochips 72g","Good Time Double Choc Chochips 72g","Good Time Rainbow Chocochips 72g","Good Time Choco Dip 71g","Good Time Coffee 72g"]},
+      {id:"BISCUIT 2.3", h:"100cm", slots:["Nabati Nextar Chocolate Pie 72g","Nabati Nextar Cheesecake Pie 72g","WRP Chocolate Chip Cookies 30g","WoCA Krunz Thin Cookies Espresso 90g","WoCA Krunz Thin Cookies Dark Choco 90g","WoCA Krunz Cookies and Cream 90g","Monde Shortbread Biscuit Mentega 115g"]},
+      {id:"BISCUIT 2.4", h:"80cm", slots:["Monde Genji Raisin Pie 85g","Monde Genji Original Pie 70g","Lotte Choco Pie Marshmallow Box 156g","Lotte Choco Pie Strawberry 156g"]},
+      {id:"BISCUIT 2.5", h:"60cm", slots:["ATB Marie Susu 180g","Regal Marie Biscuit 120g","Regal Marie Biscuit 230g","Regal Marie Biscuit Spc 230g","Nissin Lemonia 130g"]},
+      {id:"BISCUIT 2.6", h:"40cm", slots:["Roma Marie Susu New Gen 115g","MyBizcuit Gandum 135g","MyBizcuit Gandum Kismis 135g","MyBizcuit Gandum Cokelat 135g","Oatbits Raisin 110g"]},
+      {id:"BISCUIT 2.7", h:"20cm", slots:["Roma Marie Gold 10Sx20g","Roma Marie Gold Choco 132g","Roma Sari Gandum 240g","Roma Sari Gandum Biscuit 149g"]},
+      {id:"BISCUIT 2.8", h:"0cm", slots:["Roma Kelapa Biscuit 300g","Nissin Biskuit Kelapa Ijo 280g","Delux Cookies Cream Chocolate 160g","Roma Kelapa Cream Cokelat 178g"]},
+    ]
+  },
+  biscuit_3: {
+    id:"BISCUIT5H-COL3", label:"BISCUIT5H — Column 3 (Wafer)", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 3.1", h:"140cm", slots:["Delfi Twister Minis Black Vanilla 70g","Deka Wafer Mini Bites Choco 72g","Tango Wafer Chocolate Pouch 99g","Nabati Richoco Pch 100g","Tango Wafer Vanilla Pouch 99g","Nabati Richeese Pch 100g"]},
+      {id:"BISCUIT 3.2", h:"120cm", slots:["Astor Wafer Stick Double Choco 150g","Astor Double Choco 40g","Astor Wafer Stick Vanilla 40g","Astor Wafer Stick Matcha 40g","Jims Stick Wafer Chocolate 40g","Jims Stick Wafer Cappuccino 40g","Jims Stick Black Vanilla 40g","Chocolatos Rich WfrStick 54g"]},
+      {id:"BISCUIT 3.3", h:"100cm", slots:["Selamat Wafer Chocolate Pck 128g","Selamat Wafer Double Choco Box 128g","Superstar Triple Chocolate 6X16g"]},
+      {id:"BISCUIT 3.4", h:"80cm", slots:["Tango Wafer Cokelat 100g","Nissin Wafers Chocolate 110g","Roma Wafello Choco Blast 117g","Nabati Wafer Richoco 110g"]},
+      {id:"BISCUIT 3.5", h:"60cm", slots:["Tango Wafer Vanila 100g","Tango Sassy Strawberry 100g","Roma Wafello Butter Caramel 114g","Nabati Wafer Richese 110g"]},
+      {id:"BISCUIT 3.6", h:"40cm", slots:["Diasweet Wafer Vanilla 18g","Loacker Napolitaner 45g","Loacker Creamkakao 45g","My Motto Tiramisu 34g","My Motto Cocoa 34g","My Motto Hazelnut 34g","Tango Walut Belgian Choco 75g"]},
+      {id:"BISCUIT 3.7", h:"20cm", slots:["Biskies Black Milky Vanilla 72g","Mayasi Crepes Coklat 75g","Mayasi Crepes Strawberry 75g","Mayasi Crepes Choco Banana 75g","Tango Waffle Choco Hazelnut 75g"]},
+      {id:"BISCUIT 3.8", h:"0cm", slots:["Biskies Black Choco Creme 72g","Hatari Peanut Jam Biscuit 225g","Kokola Kukis Butter 218g","Monde Butter Cookies 150g","Khong Guan Assorted Biscuit 300g"]},
+    ]
+  },
+  biscuit_5: {
+    id:"BISCUIT5H-COL5", label:"BISCUIT5H — Column 5 (Pocky/Snacks)", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 5.1", h:"140cm", slots:["Lemonilo Brownies Crispy Choco 35g","Lemonilo Brownies Crispy Chese 35g","Lemonilo Brownies Cheese Strawberry 35g","Airas Brownies Crispy Coklat 30g","Tango Brownies Crispy 35g"]},
+      {id:"BISCUIT 5.2", h:"120cm", slots:["Ranjani MRC Macaron Cookies 50g","Ranjani MRC Macaron Cookies 100g","Monde Egg Drops 110g","Pocky Chocolate Share Pack 154g","Pocky Strawberry Share Pack 154g"]},
+      {id:"BISCUIT 5.3", h:"100cm", slots:["Pocky Chocolate 47g","Pocky Strawberry 45g","Pocky Crushed Blueberry Peach 38g","Pocky Crushed Strawberry Peach 38g","Pocky Crushed Nuts Milk Almond 25g","Pocky Milk Flavor 39g","Pocky Milk Chocolate 39g"]},
+      {id:"BISCUIT 5.4", h:"80cm", slots:["Pocky Cookies & Cream 40g","Pocky Double Choco 47g","Pocky Crushed Nuts Dark Almond 25g","Lotte Almond Pepero 32g","Lotte Pepero White Cookie 32g","Apetito Biscuit Stick BBQ 41g","Apetito Biscuit Stick Sour Cream 41g","Apetito Biscuit Stick Pizza 41g"]},
+      {id:"BISCUIT 5.5", h:"60cm", slots:["Hello Panda Coklat 42g","Hello Panda Double Choco 42g","Hello Panda Strawberry 42g","Hello Panda Caramel 42g","Nyam-Nyam Pop Stix 48g","Nyam Nyam Smiley Cokelat 45g","Choki Choki Stix Biscuit","Glico Pejoy Belgian Chocolate 30g"]},
+      {id:"BISCUIT 5.6", h:"40cm", slots:["Bess Diip Mini Snack Strawberry 96g","Nyam Nyam Bubble Puff Chocolate 18g","Nyam Nyam Fantasy Stick Coklat 25g","Barbie Jumbo Choco Snack 45g","Bess Diip Jumbo Snack Strawberry 45g","Chocolito Rich Choco 38g"]},
+      {id:"BISCUIT 5.7", h:"0cm", slots:["Bess Diip Mini Choco Snack 96g","Pororo Choco Stick Cookie & Choco 54g","Pororo Cone Little Penguin Choco 54g","Pororo Cone Little Penguin Strawberry 54g"]},
+    ]
+  }
+};
+
+// Simulated compliance results (realistic issues per zone)
+const RESULTS = {
+  snack_1: { score:83, missing:1, misplaced:2, unexpected:1, correct:29,
+    missingAt:[{r:0,s:3}], misplacedAt:[{r:1,s:2},{r:3,s:4}], unexpectedAt:[{r:2,s:4}],
+    unexpectedName:"Chitato Mi Goreng 65g (duplicate)",
+    issues:[
+      {type:"missing", prod:"Chitato Lite Sour Cream 68g", detail:"Expected SNACK 1.1 Slot 4 — product not on shelf"},
+      {type:"misplaced", prod:"Chitato Mi Goreng 65g", detail:"Found at SNACK 1.2 Slot 3 — should be Slot 3, Chitato Original displaced it"},
+      {type:"misplaced", prod:"Kusuka Singkong BBQ 60g", detail:"Found at SNACK 1.4 Slot 5 instead of Slot 4"},
+      {type:"unexpected", prod:"Chitato Mi Goreng 65g (extra facing)", detail:"Duplicate found at SNACK 1.3 Slot 5 — not in this zone's planogram"}
+    ]
+  },
+  snack_2: { score:78, missing:2, misplaced:1, unexpected:2, correct:22,
+    missingAt:[{r:0,s:2},{r:3,s:3}], misplacedAt:[{r:2,s:1}], unexpectedAt:[{r:1,s:4},{r:5,s:5}],
+    unexpectedName:"Chitato Original 68g",
+    issues:[
+      {type:"missing", prod:"Potabee Seaweed 65g", detail:"Expected SNACK 2.1 Slot 3 — product not found"},
+      {type:"missing", prod:"Chiki Twist Jagung Bakar 65g", detail:"Expected SNACK 2.3 Slot 4 — out of stock or not placed"},
+      {type:"misplaced", prod:"Piattos Sapi Panggang 65g", detail:"Found SNACK 1.7 Slot 2 — should be at Slot 3"},
+      {type:"unexpected", prod:"Chitato Original 68g", detail:"Found SNACK 2.2 Slot 5 — belongs in Column 1, not Column 2"},
+      {type:"unexpected", prod:"Momogi Mini Stick Roasted Corn 50g", detail:"Found SNACK 2.5 Slot 6 — wrong slot, planogram ends at Slot 5"}
+    ]
+  },
+  snack_3: { score:90, missing:1, misplaced:1, unexpected:1, correct:27,
+    missingAt:[{r:1,s:2}], misplacedAt:[{r:3,s:0}], unexpectedAt:[{r:5,s:4}],
+    unexpectedName:"Dua Kelinci Sukro 95g (over-faced)",
+    issues:[
+      {type:"missing", prod:"Mayasi Kacang Jepang Garlic 65g", detail:"Expected SNACK 3.2 Slot 3 — not found"},
+      {type:"misplaced", prod:"Garuda Rosta Kac Panggang Pedas 95g", detail:"Found SNACK 3.4 Slot 1 — facings inverted with Bawang variant"},
+      {type:"unexpected", prod:"Dua Kelinci Sukro 95g (extra)", detail:"Extra facing at SNACK 3.6 Slot 5 — planogram allocates 1 facing"}
+    ]
+  },
+  biscuit_1: { score:72, missing:3, misplaced:1, unexpected:2, correct:22,
+    missingAt:[{r:0,s:2},{r:2,s:2},{r:2,s:3}], misplacedAt:[{r:1,s:2}], unexpectedAt:[{r:4,s:2},{r:6,s:0}],
+    unexpectedName:"Nabati Richoco Pch 100g",
+    issues:[
+      {type:"missing", prod:"Oreo Dark & White Choco 105g", detail:"Expected BISCUIT 1.1 Slot 3 — not found on shelf"},
+      {type:"missing", prod:"Milo Biscuit Activ Original 104g", detail:"Expected BISCUIT 1.3 Slot 3 — product missing"},
+      {type:"missing", prod:"Milo Biscuit Activ Milk 104g", detail:"Expected BISCUIT 1.3 Slot 4 — product missing"},
+      {type:"misplaced", prod:"Serena Togo Long Choc Sandwich 128g", detail:"Found BISCUIT 1.2 Slot 3 position swapped with Rasa Kacang variant"},
+      {type:"unexpected", prod:"Nabati Richoco Pch 100g", detail:"Found BISCUIT 1.5 Slot 3 — belongs in Column 3 (Wafer), not Column 1"},
+      {type:"unexpected", prod:"Unibis Bon Bon Chocolate 200g (double-faced)", detail:"BISCUIT 1.7 Slot 1 — 2 facings placed, planogram allows only 1"}
+    ]
+  },
+  biscuit_2: { score:86, missing:1, misplaced:2, unexpected:1, correct:33,
+    missingAt:[{r:2,s:5}], misplacedAt:[{r:3,s:1},{r:5,s:3}], unexpectedAt:[{r:0,s:4}],
+    unexpectedName:"Good Time Rainbow Chocochips 72g (wrong col)",
+    issues:[
+      {type:"missing", prod:"WoCA Krunz Cookies and Cream 90g", detail:"Expected BISCUIT 2.3 Slot 6 — not found"},
+      {type:"misplaced", prod:"Monde Genji Original Pie 70g", detail:"Found BISCUIT 2.4 Slot 2 — swapped position with Raisin variant"},
+      {type:"misplaced", prod:"MyBizcuit Gandum Cokelat 135g", detail:"Found BISCUIT 2.6 Slot 4 instead of Slot 3"},
+      {type:"unexpected", prod:"Good Time Rainbow Chocochips 72g", detail:"Extra facing at BISCUIT 2.1 Slot 5 — row 2.2 product placed in 2.1"}
+    ]
+  },
+  biscuit_3: { score:88, missing:1, misplaced:2, unexpected:1, correct:34,
+    missingAt:[{r:2,s:2}], misplacedAt:[{r:1,s:4},{r:6,s:3}], unexpectedAt:[{r:4,s:2}],
+    unexpectedName:"Oreo Vanilla 105g",
+    issues:[
+      {type:"missing", prod:"Superstar Triple Chocolate 6X16g", detail:"Expected BISCUIT 3.3 Slot 3 — not found"},
+      {type:"misplaced", prod:"Jims Stick Wafer Cappuccino 40g", detail:"Found BISCUIT 3.2 Slot 5 instead of Slot 6 — adjacent slots swapped"},
+      {type:"misplaced", prod:"Mayasi Crepes Choco Banana 75g", detail:"Found BISCUIT 3.7 Slot 4 — Roma Wafello displaced into row 3.7"},
+      {type:"unexpected", prod:"Oreo Vanilla 105g", detail:"Found BISCUIT 3.5 Slot 3 — belongs in Column 1, not Column 3"}
+    ]
+  },
+  biscuit_5: { score:81, missing:2, misplaced:1, unexpected:2, correct:31,
+    missingAt:[{r:2,s:4},{r:2,s:5}], misplacedAt:[{r:4,s:6}], unexpectedAt:[{r:1,s:3},{r:3,s:7}],
+    unexpectedName:"Pocky Double Choco (wrong row)",
+    issues:[
+      {type:"missing", prod:"Pocky Crushed Nuts Milk Almond 25g", detail:"Expected BISCUIT 5.3 Slot 5 — not found"},
+      {type:"missing", prod:"Pocky Milk Flavor 39g", detail:"Expected BISCUIT 5.3 Slot 6 — not found"},
+      {type:"misplaced", prod:"Choki Choki Stix Biscuit", detail:"Found BISCUIT 5.5 Slot 7 — adjacent slot nudged"},
+      {type:"unexpected", prod:"Monde Egg Drops 110g (extra facing)", detail:"Extra facing at BISCUIT 5.2 Slot 4 — over planogram allocation"},
+      {type:"unexpected", prod:"Pocky Double Choco 47g (wrong row)", detail:"Found BISCUIT 5.4 Slot 8 — Apetito Biscuit Stick Pizza expected there"}
+    ]
+  }
+};
+
+// ═══════════════════════════════════
+//  PDF LIBRARY (simulated uploaded files)
+// ═══════════════════════════════════
+let pdfLibrary = [
+  {name:"SNACK3C.pdf", label:"SNACK3C", category:"Snack", date:"01 Apr 2026", products:101, status:"active"},
+  {name:"BISCUIT5H.pdf", label:"BISCUIT5H", category:"Biscuit", date:"17 Mar 2026", products:159, status:"active"},
+];
+
+// ═══════════════════════════════════
+//  STATE
+// ═══════════════════════════════════
+let currentCheckStep = 1;
+let selectedZoneKey = 'snack_1';
+let uploadedPhoto = null;
+
+// ═══════════════════════════════════
+//  NAV
+// ═══════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map = {dashboard:0,check:1,library:2,upload:3};
+  const btns = document.querySelectorAll('.nav-btn');
+  if(map[id]!==undefined) btns[map[id]].classList.add('active');
+  if(id==='library') renderLibrary();
+  if(id==='upload') renderPdfList();
+}
+
+// ═══════════════════════════════════
+//  SHELF RENDERER
+// ═══════════════════════════════════
+function shortN(s) { return s.length > 14 ? s.substring(0,13)+'…' : s; }
+
+function renderShelf(containerId, planKey, result, annotate) {
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const plan = PLANS[planKey];
+  c.innerHTML = '';
+  plan.rows.forEach((row, ri) => {
+    const sec = document.createElement('div');
+    sec.className = 'shelf-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'shelf-row-label';
+    lbl.innerHTML = `<strong>${row.id}</strong> <span style="font-weight:400;">${row.h}</span>`;
+    sec.appendChild(lbl);
+    const slots = document.createElement('div');
+    slots.className = 'shelf-slots';
+    row.slots.forEach((prod, si) => {
+      const s = document.createElement('div');
+      s.className = 'slot';
+      let cls = '';
+      if(annotate && result) {
+        if(result.missingAt && result.missingAt.some(x=>x.r===ri&&x.s===si)) cls='missing';
+        else if(result.misplacedAt && result.misplacedAt.some(x=>x.r===ri&&x.s===si)) cls='misplaced';
+        else if(result.unexpectedAt && result.unexpectedAt.some(x=>x.r===ri&&x.s===si)) cls='unexpected';
+        else cls='correct';
+      }
+      if(cls) s.classList.add(cls);
+      const num = document.createElement('span');
+      num.className = 'slot-num';
+      num.textContent = 'S'+(si+1);
+      s.appendChild(num);
+      if(cls==='missing') {
+        s.innerHTML += `<span class="slot-status" style="color:var(--red);">—</span><span style="font-size:9px;color:var(--red);">missing</span>`;
+      } else if(cls==='unexpected') {
+        s.innerHTML += `<span class="slot-status" style="color:var(--amber);">!</span><span style="font-size:9px;">${shortN(result.unexpectedName||prod)}</span>`;
+      } else {
+        if(cls==='correct') s.innerHTML += `<span class="slot-status" style="color:#16A34A;">✓</span>`;
+        if(cls==='misplaced') s.innerHTML += `<span class="slot-status" style="color:#BE185D;">⚠</span>`;
+        s.innerHTML += `<span>${shortN(prod)}</span>`;
+      }
+      slots.appendChild(s);
+    });
+    sec.appendChild(slots);
+    c.appendChild(sec);
+  });
+}
+
+// ═══════════════════════════════════
+//  CHECK WIZARD
+// ═══════════════════════════════════
+function updateWizard(n) {
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('wd'+i);
+    const l=document.getElementById('wl'+i);
+    if(i<n){ d.className='wdot done'; d.textContent='✓'; l.className='wlabel'; }
+    else if(i===n){ d.className='wdot active'; d.textContent=String(i); l.className='wlabel active'; }
+    else { d.className='wdot idle'; d.textContent=String(i); l.className='wlabel'; }
+  }
+}
+
+function goCheckStep(n) {
+  for(let i=1;i<=4;i++) { const el=document.getElementById('cs'+i); if(el) el.style.display='none'; }
+  const el = document.getElementById('cs'+n);
+  if(el){ el.style.display='block'; el.classList.add('fade-in'); }
+  currentCheckStep = n;
+  updateWizard(n);
+  if(n===1) initStep1();
+  if(n===2) initStep2();
+  if(n===3) runAnalysis();
+}
+
+function initStep1() {
+  updateZonePreview();
+}
+
+function updateZonePreview() {
+  selectedZoneKey = document.getElementById('zoneSelect').value;
+  const plan = PLANS[selectedZoneKey];
+  document.getElementById('zoneId').textContent = plan.id;
+  renderShelf('refPreview', selectedZoneKey, null, false);
+  const total = plan.rows.reduce((a,r)=>a+r.slots.length,0);
+  document.getElementById('refMeta').innerHTML =
+    `<span class="tag tag-blue">📄 ${plan.file}</span>
+     <span class="tag tag-gray">${plan.rows.length} rows</span>
+     <span class="tag tag-gray">${total} slots</span>
+     <span class="tag tag-green">Active</span>`;
+}
+
+function initStep2() {
+  const plan = PLANS[selectedZoneKey];
+  const store = document.getElementById('storeSelect').value;
+  document.getElementById('apiPreview').textContent =
+`POST /check HTTP/1.1
+Content-Type: application/json
+
+{
+  "planogram_id": "${plan.id}",
+  "store_id": "${store}",
+  "image": "[base64 encoded JPG]",
+  "timestamp": "${new Date().toISOString().slice(0,19)}Z"
+}`;
+  document.getElementById('selectedZoneTag').innerHTML =
+    `<span class="tag tag-blue">${plan.id}</span>
+     <span class="tag tag-gray">${store}</span>
+     <span class="tag tag-gray">${plan.rows.reduce((a,r)=>a+r.slots.length,0)} slots to check</span>`;
+}
+
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  uploadedPhoto = file;
+  const zone = document.getElementById('photoZone');
+  zone.classList.add('has-file');
+  document.getElementById('photoZoneContent').innerHTML =
+    `<div style="font-size:28px; margin-bottom:6px;">✅</div>
+     <div style="font-size:13px; font-weight:600; color:var(--green);">Photo uploaded</div>
+     <div style="font-size:11px; color:var(--gray-500); margin-top:3px;">${file.name} · ${(file.size/1024/1024).toFixed(1)} MB</div>`;
+  document.getElementById('photoInfo').style.display='block';
+  document.getElementById('photoInfo').innerHTML =
+    `<div class="banner banner-green">✓ ${file.name} ready for analysis</div>`;
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = false;
+}
+
+function buildStreamText(planKey, result) {
+  const plan = PLANS[planKey];
+  const store = document.getElementById('storeSelect').value;
+  const lines = [
+    `[system] Starting compliance check for ${plan.id}`,
+    `[pdf_extractor] Loading ${plan.file} via PyMuPDF…`,
+    `[pdf_extractor] Extracted planogram image from page 2`,
+    `[vision] Sending 2 images to claude-sonnet-4 API…`,
+    `[vision] Prompt: "Compare the shelf photo against the planogram. For each row, identify correct, missing, misplaced, and unexpected products by reading packaging text."`,
+    `[vision] Scanning shelf photo top-to-bottom…`,
+  ];
+  plan.rows.forEach(row => {
+    lines.push(`[vision] ${row.id} (${row.h}): reading ${row.slots.length} facings…`);
+  });
+  if(result.missingAt.length > 0)
+    lines.push(`[vision] ⚠ ${result.missingAt.length} empty slot(s) detected`);
+  if(result.misplacedAt.length > 0)
+    lines.push(`[vision] ⚠ ${result.misplacedAt.length} misplaced product(s) found`);
+  if(result.unexpectedAt.length > 0)
+    lines.push(`[vision] ⚠ ${result.unexpectedAt.length} unexpected product(s) detected`);
+  lines.push(`[result] Cross-referencing ${plan.rows.reduce((a,r)=>a+r.slots.length,0)} positions against planogram data…`);
+  lines.push(`[result] Compliance score: ${result.score}%`);
+  lines.push(`[supabase] Logging result to compliance_logs table…`);
+  lines.push(`[done] Response ready for ${store}`);
+  return lines;
+}
+
+function runAnalysis() {
+  const plan = PLANS[selectedZoneKey];
+  const result = RESULTS[selectedZoneKey];
+  const stepDefs = [
+    'Extracting planogram PDF via PyMuPDF',
+    'Sending images to claude-sonnet-4 Vision API',
+    'Reading product labels on shelf photo',
+    'Mapping detected positions to planogram grid',
+    'Computing compliance score + building JSON'
+  ];
+  const stepsDiv = document.getElementById('analysisSteps');
+  stepsDiv.innerHTML = stepDefs.map((_,i) =>
+    `<div class="a-step" id="as${i}">
+      <span class="a-step-icon" id="ai${i}">⏳</span>
+      <span>${stepDefs[i]}</span>
+    </div>`
+  ).join('');
+  const sb = document.getElementById('streamBox');
+  sb.textContent = '';
+  const lines = buildStreamText(selectedZoneKey, result);
+  let li = 0, si = 0;
+  const pct = document.getElementById('pctLabel');
+  const pb = document.getElementById('progressBar');
+  const statusTxt = document.getElementById('aiStatusText');
+  function tick() {
+    if(li < lines.length) {
+      sb.textContent += (li===0?'':'\n') + lines[li++];
+      sb.scrollTop = sb.scrollHeight;
+      const p = Math.round((li/lines.length)*100);
+      pb.style.width = p+'%'; pct.textContent = p+'%';
+      const sIdx = Math.min(stepDefs.length-1, Math.floor((li/lines.length)*stepDefs.length));
+      if(sIdx > si) {
+        document.getElementById('ai'+si).textContent = '✅';
+        document.getElementById('as'+si).className = 'a-step done';
+        si = sIdx;
+        document.getElementById('as'+si).className = 'a-step active';
+        statusTxt.textContent = stepDefs[si] + '…';
+      }
+      setTimeout(tick, li < 5 ? 550 : 420);
+    } else {
+      for(let i=0;i<stepDefs.length;i++){
+        document.getElementById('ai'+i).textContent = '✅';
+        document.getElementById('as'+i).className = 'a-step done';
+      }
+      document.getElementById('aiBadge').innerHTML = '✓ Done';
+      document.getElementById('aiBadge').style.background = 'var(--green-pale)';
+      document.getElementById('aiBadge').style.color = 'var(--green)';
+      document.getElementById('aiAvatar').textContent = '✅';
+      pb.style.width = '100%'; pct.textContent = '100%';
+      statusTxt.textContent = `Analysis complete — ${result.score}% compliance`;
+      setTimeout(() => { goCheckStep(4); renderResult(); }, 700);
+    }
+  }
+  setTimeout(tick, 300);
+}
+
+function renderResult() {
+  const plan = PLANS[selectedZoneKey];
+  const result = RESULTS[selectedZoneKey];
+  const store = document.getElementById('storeSelect').value;
+  const totalIssues = result.missing + result.misplaced + result.unexpected;
+  const scoreColor = result.score >= 90 ? '#15803D' : result.score >= 75 ? '#B45309' : '#DC2626';
+  const scoreBg = result.score >= 90 ? 'var(--green-pale)' : result.score >= 75 ? 'var(--amber-pale)' : 'var(--red-pale)';
+  const scoreLabel = result.score >= 90 ? 'Pass' : result.score >= 75 ? 'Needs review' : 'Fail';
+  const badgeCls = result.score >= 90 ? 'badge-green' : result.score >= 75 ? 'badge-amber' : 'badge-red';
+  const issueColors = {missing:{bg:'var(--red-pale)',icon:'❌',cls:'tag-red'},misplaced:{bg:'#FDF2F8',icon:'⚠',cls:'tag-purple'},unexpected:{bg:'var(--amber-pale)',icon:'!',cls:'tag-amber'}};
+  const jsonPayload = JSON.stringify({
+    planogram_id:plan.id, store_id:store,
+    status:result.score>=90?'pass':'fail',
+    compliance_score:result.score,
+    issues:result.issues.map(i=>({type:i.type,product:i.prod,note:i.detail})),
+    correct_count:result.correct,
+    summary:`Zone ${plan.id}: ${totalIssues} issue(s) — ${result.missing} missing, ${result.misplaced} misplaced, ${result.unexpected} unexpected. ${result.correct} correctly placed.`,
+    timestamp:new Date().toISOString()
+  }, null, 2);
+
+  document.getElementById('resultContent').innerHTML = `
+    <div class="grid-2" style="margin-bottom:14px;">
+      <div class="card" style="display:flex; align-items:center; gap:16px;">
+        <div class="score-circle" style="background:${scoreBg}; min-width:90px;">
+          <span class="score-num" style="color:${scoreColor};">${result.score}%</span>
+          <span class="score-lbl" style="color:${scoreColor};">compliance</span>
+        </div>
+        <div>
+          <div style="font-size:13px; font-weight:600; margin-bottom:4px;">${plan.id}</div>
+          <span class="badge ${badgeCls}">${scoreLabel}</span>
+          <div style="font-size:11px; color:var(--gray-500); margin-top:6px;">${store}</div>
+          <div style="font-size:11px; color:var(--gray-500);">${new Date().toLocaleString('id-ID')}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Summary</div>
+        <div style="font-size:13px; line-height:1.6;">Zone ${plan.id}: ${totalIssues} compliance issue(s) found. ${result.correct} products correctly placed.</div>
+        <div class="grid-4" style="margin-top:12px;">
+          <div class="metric-card"><div class="metric-lbl">Correct</div><div class="metric-num" style="color:#15803D;">${result.correct}</div></div>
+          <div class="metric-card"><div class="metric-lbl">Missing</div><div class="metric-num" style="color:#DC2626;">${result.missing}</div></div>
+          <div class="metric-card"><div class="metric-lbl">Misplaced</div><div class="metric-num" style="color:#9D174D;">${result.misplaced}</div></div>
+          <div class="metric-card"><div class="metric-lbl">Unexpected</div><div class="metric-num" style="color:#B45309;">${result.unexpected}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="section-label" style="margin-bottom:10px;">Shelf comparison — reference vs detected</div>
+      <div class="grid-2">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;">📄 Reference (planogram PDF)</div>
+          <div id="resultRef" style="max-height:320px;overflow-y:auto;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;">📷 Actual shelf (AI detected)</div>
+          <div id="resultActual" style="max-height:320px;overflow-y:auto;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;font-size:11px;">
+        <span class="tag tag-green">✓ Correct</span>
+        <span class="tag tag-red">— Missing</span>
+        <span class="tag tag-purple">⚠ Misplaced</span>
+        <span class="tag tag-amber">! Unexpected</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="section-label" style="margin-bottom:10px;">Issues detail</div>
+      <div id="issuesList"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">JSON response to FamilyLink</div>
+      <div class="code-block">${jsonPayload}</div>
+    </div>
+  `;
+  renderShelf('resultRef', selectedZoneKey, null, false);
+  renderShelf('resultActual', selectedZoneKey, result, true);
+  const iList = document.getElementById('issuesList');
+  result.issues.forEach(iss => {
+    const c = issueColors[iss.type];
+    iList.innerHTML += `
+      <div class="issue-item">
+        <div class="issue-dot" style="background:${c.bg};">${c.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${iss.prod}</div>
+          <div style="font-size:11px;color:var(--gray-600);">${iss.detail}</div>
+        </div>
+        <span class="tag ${c.cls}">${iss.type}</span>
+      </div>`;
+  });
+}
+
+function resetCheck() {
+  uploadedPhoto = null;
+  const pz = document.getElementById('photoZone');
+  if(pz) pz.classList.remove('has-file');
+  const pzc = document.getElementById('photoZoneContent');
+  if(pzc) pzc.innerHTML = `<div class="upload-icon">📷</div><div class="upload-title">Upload shelf photo</div><div class="upload-sub">JPG or PNG · Photo taken in-store by supervisor</div>`;
+  const pi = document.getElementById('photoInfo');
+  if(pi) pi.style.display='none';
+  const ab = document.getElementById('analyzeBtn');
+  if(ab) ab.disabled = true;
+  const rc = document.getElementById('resultContent');
+  if(rc) rc.innerHTML = '';
+  goCheckStep(1);
+}
+
+// ═══════════════════════════════════
+//  LIBRARY
+// ═══════════════════════════════════
+function switchLibTab(which) {
+  document.querySelectorAll('.tabs .tab').forEach((t,i)=>t.classList.toggle('active', (i===0&&which==='snack')||(i===1&&which==='biscuit')));
+  document.getElementById('libSnack').style.display = which==='snack'?'block':'none';
+  document.getElementById('libBiscuit').style.display = which==='biscuit'?'block':'none';
+}
+
+function renderLibrary() {
+  const snackKeys = ['snack_1','snack_2','snack_3'];
+  const biscuitKeys = ['biscuit_1','biscuit_2','biscuit_3','biscuit_5'];
+  function renderCol(keys, containerId) {
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    keys.forEach(k => {
+      const plan = PLANS[k];
+      const total = plan.rows.reduce((a,r)=>a+r.slots.length,0);
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.style.marginBottom = '14px';
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:600;font-size:13px;">${plan.id}</div>
+            <div style="font-size:11px;color:var(--gray-500);">${plan.label}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span class="badge badge-green">Active</span>
+            <button class="btn btn-sm btn-primary" onclick="preSelectAndCheck('${k}')">Check shelf →</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
+          <span class="tag tag-gray">${total} product slots</span>
+          <span class="tag tag-gray">${plan.rows.length} rows</span>
+          <span class="tag tag-blue">${plan.file}</span>
+        </div>`;
+      const shelfDiv = document.createElement('div');
+      shelfDiv.id = 'lib_'+k;
+      shelfDiv.style.maxHeight = '200px';
+      shelfDiv.style.overflowY = 'auto';
+      div.appendChild(shelfDiv);
+      c.appendChild(div);
+      renderShelf('lib_'+k, k, null, false);
+    });
+  }
+  renderCol(snackKeys, 'libSnackContent');
+  renderCol(biscuitKeys, 'libBiscuitContent');
+}
+
+function preSelectAndCheck(key) {
+  showPage('check');
+  document.getElementById('zoneSelect').value = key;
+  selectedZoneKey = key;
+  goCheckStep(1);
+}
+
+// ═══════════════════════════════════
+//  PDF UPLOAD PAGE
+// ═══════════════════════════════════
+function renderPdfList() {
+  const c = document.getElementById('pdfList');
+  c.innerHTML = '';
+  pdfLibrary.forEach((pdf, idx) => {
+    c.innerHTML += `
+      <div class="pdf-item">
+        <div class="pdf-icon">📄</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${pdf.name}</div>
+          <div style="font-size:11px;color:var(--gray-500);">${pdf.label} · ${pdf.category} · ${pdf.products} products</div>
+        </div>
+        <span class="tag tag-gray">${pdf.date}</span>
+        <span class="badge badge-green">Active</span>
+      </div>`;
+  });
+}
+
+function handlePdfUpload(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  document.getElementById('pdfDropZone').innerHTML =
+    `<div style="font-size:28px;margin-bottom:8px;">✅</div>
+     <div style="font-size:14px;font-weight:500;color:var(--green);">${file.name} ready</div>
+     <div style="font-size:12px;color:var(--gray-500);margin-top:3px;">${(file.size/1024).toFixed(0)} KB · Click to change</div>`;
+  document.getElementById('uploadStatus').style.display='block';
+  document.getElementById('uploadStatus').innerHTML =
+    `<div class="banner banner-green">✓ PDF selected: ${file.name}</div>`;
+  document.getElementById('uploadForm').style.display='block';
+  // Pre-fill label from filename
+  const guessLabel = file.name.replace('.pdf','').toUpperCase();
+  document.getElementById('pdfLabel').value = guessLabel;
+}
+
+function confirmPdfUpload() {
+  const label = document.getElementById('pdfLabel').value.trim();
+  const cat = document.getElementById('pdfCategory').value;
+  if(!label){ alert('Please enter a zone label.'); return; }
+  pdfLibrary.push({
+    name:label+'.pdf', label:label, category:cat,
+    date:new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}),
+    products:'?', status:'active'
+  });
+  document.getElementById('uploadStatus').innerHTML =
+    `<div class="banner banner-green">✅ ${label}.pdf added to planogram library! Supervisors can now select this zone in the shelf check.</div>`;
+  document.getElementById('uploadForm').style.display='none';
+  document.getElementById('pdfDropZone').innerHTML =
+    `<div style="font-size:36px;margin-bottom:10px;">📄</div>
+     <div style="font-size:14px;font-weight:500;margin-bottom:4px;">Click to upload another planogram PDF</div>
+     <div style="font-size:12px;color:var(--gray-500);">Exported from Spaceman software · PDF format</div>`;
+  renderPdfList();
+}
+
+// ═══════════════════════════════════
+//  INIT
+// ═══════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  goCheckStep(1);
+  renderLibrary();
+  renderPdfList();
+});
+</script>
+
+</body>
+</html>
