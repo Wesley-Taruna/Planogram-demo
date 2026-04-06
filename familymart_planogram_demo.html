@@ -353,6 +353,97 @@ code, .mono { font-family: 'DM Mono', monospace; }
 .slot.unexpected { background: var(--amber-pale); border-color: #FCD34D; color: var(--amber); }
 .slot-status { font-size: 9px; font-weight: 700; }
 
+/* ── PDF PLANOGRAM VIEWER ── */
+.pdf-viewer {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.pdf-hdr {
+  background: linear-gradient(135deg, #162916, #223622);
+  color: white;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.pdf-hdr-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
+.pdf-hdr-sub { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.pdf-hdr-right { text-align: right; }
+.pdf-hdr-meta { font-size: 10px; color: rgba(255,255,255,0.55); line-height: 1.8; }
+.pdf-slides-wrap { position: relative; overflow: hidden; }
+.pdf-slide { display: none; }
+.pdf-slide.active { display: block; }
+.pdf-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--gray-50);
+}
+.pdf-nav-btn {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--gray-700);
+  font-family: 'Sora', sans-serif;
+  transition: all 0.12s;
+}
+.pdf-nav-btn:hover:not(:disabled) { background: var(--gray-100); border-color: var(--gray-400); }
+.pdf-nav-btn:disabled { opacity: 0.3; cursor: default; }
+.pdf-page-ind {
+  font-size: 11px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gray-300); display: inline-block; transition: background 0.2s; }
+.pdf-dot.on { background: var(--green); }
+/* Shelf diagram slide */
+.pdf-shelf-diagram { padding: 12px 14px 8px; overflow-y: auto; max-height: 370px; }
+.pdf-shelf-row { display: flex; align-items: stretch; margin-bottom: 5px; }
+.pdf-row-lbl {
+  width: 80px; flex-shrink: 0;
+  font-size: 9px; font-weight: 600; color: var(--gray-600);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-right: 8px; text-align: right; padding-bottom: 7px; line-height: 1.4;
+}
+.pdf-row-lbl .rh { font-size: 8px; color: var(--gray-400); font-weight: 400; font-family: 'DM Mono', monospace; }
+.pdf-shelf-prods {
+  flex: 1; border-bottom: 3px solid #9aab9a; padding-bottom: 5px;
+  display: flex; gap: 3px; align-items: flex-end; overflow-x: auto;
+}
+.pdf-pblock {
+  border: 1px solid; border-radius: 5px; padding: 4px 5px;
+  min-width: 50px; flex: 1; display: flex; align-items: center;
+  justify-content: center; min-height: 44px;
+}
+.pdf-pname { font-size: 8px; font-weight: 600; text-align: center; line-height: 1.35; }
+/* Position table slide */
+.pdf-tbl-wrap { overflow-y: auto; max-height: 370px; }
+.pdf-tbl {
+  width: 100%; border-collapse: collapse; font-size: 10.5px;
+}
+.pdf-tbl thead th {
+  background: #eef3ee; padding: 6px 10px; text-align: left;
+  font-weight: 700; font-size: 9px; color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  position: sticky; top: 0; z-index: 1; border-bottom: 2px solid var(--border);
+}
+.pdf-tbl td { padding: 4px 10px; border-bottom: 1px solid var(--gray-100); color: var(--gray-800); vertical-align: middle; }
+.pdf-sec-row td {
+  background: linear-gradient(90deg, #f0f9f4, #f8fdf9);
+  font-weight: 700; color: var(--green); font-size: 10px;
+  padding: 6px 10px; border-top: 2px solid var(--green-dim); border-bottom: 1px solid var(--green-dim);
+}
+.pdf-tbl tbody tr:not(.pdf-sec-row):hover td { background: var(--gray-50); }
+
 /* ── ANALYSIS STREAM ── */
 .stream-box {
   background: var(--gray-900);
@@ -764,9 +855,9 @@ Content-Type: application/json
           </div>
         </div>
         <div class="card">
-          <div class="section-label">Planogram reference — <span id="zoneId">SNACK3C-COL1</span></div>
-          <div id="refPreview" style="max-height:280px; overflow-y:auto;"></div>
-          <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;" id="refMeta"></div>
+          <div class="section-label" style="margin-bottom:10px;">Planogram reference — <span id="zoneId" style="font-family:'DM Mono',monospace;color:var(--green);">SNACK3C-COL1</span></div>
+          <div id="refPreview"></div>
+          <div style="margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;" id="refMeta"></div>
         </div>
       </div>
       <div style="margin-top:16px;">
@@ -1184,6 +1275,142 @@ function renderShelf(containerId, planKey, result, annotate) {
 }
 
 // ═══════════════════════════════════
+//  PDF PLANOGRAM VIEWER
+// ═══════════════════════════════════
+let _pdfVid = 0;
+const _pdfPages = {};
+const _brandColors = [
+  ['pocky','#C2185B'],['oreo','#212121'],['pringles','#C62828'],
+  ['chitato','#E65100'],['tango','#1565C0'],['nabati','#E53935'],
+  ['good time','#D32F2F'],['regal','#5D4037'],['milo','#2E7D32'],
+  ['lays','#F9A825'],['roma','#1976D2'],['monde','#6A1B9A'],
+  ['garuda','#6D4C41'],['nissin','#B71C1C'],['potabee','#558B2F'],
+  ['japota','#BF360C'],['chiki','#E65100'],['mayasi','#00695C'],
+  ['astor','#4527A0'],['loacker','#4E342E'],['hello panda','#AD1457'],
+  ['tic tac','#1B5E20'],['dua kelinci','#0D47A1'],['kusuka','#827717'],
+  ['maxicorn','#E64A19'],['chuba','#4A148C'],['happytos','#1A237E'],
+  ['lemonilo','#2E7D32'],['biskies','#37474F'],['khong guan','#B71C1C'],
+  ['ritz','#1565C0'],['imperial','#880E4F'],['qtela','#388E3C'],
+  ['taro','#0277BD'],['kokola','#4E342E'],['mooochii','#F06292'],
+  ['loacker','#795548'],['woca','#00838F'],['nabati','#E53935'],
+];
+function _brandColor(name) {
+  const n = name.toLowerCase();
+  for (const [b, c] of _brandColors) { if (n.includes(b)) return c; }
+  let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) & 0xffff;
+  return `hsl(${h % 330},52%,36%)`;
+}
+function _shortProd(s) {
+  // Strip weight at end, shorten brand name
+  return s.replace(/\s*\d+[gGxX][\w.]*$/, '').trim().replace(/(.{18}).*/, '$1…');
+}
+
+function renderPlanogramRef(containerId, planKey) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const plan = PLANS[planKey];
+  const vid = 'pv' + (++_pdfVid);
+  _pdfPages[vid] = 1;
+
+  const pdfMeta = {
+    'SNACK3C.pdf':  { date:'01 April 2026', time:'11:39:16' },
+    'BISCUIT5H.pdf':{ date:'17 Maret 2026', time:'8:51:14'  }
+  };
+  const meta = pdfMeta[plan.file] || { date:'—', time:'—' };
+  const total = plan.rows.reduce((a, r) => a + r.slots.length, 0);
+
+  // ── Slide 1: Shelf Diagram ──
+  let shelfHTML = '<div class="pdf-shelf-diagram">';
+  plan.rows.forEach(row => {
+    let prods = '';
+    row.slots.forEach(prod => {
+      const col = _brandColor(prod);
+      prods += `<div class="pdf-pblock" style="border-color:${col}55;background:${col}14;">
+        <span class="pdf-pname" style="color:${col};">${_shortProd(prod)}</span>
+      </div>`;
+    });
+    shelfHTML += `<div class="pdf-shelf-row">
+      <div class="pdf-row-lbl">
+        <span>${row.id}</span>
+        <span class="rh">${row.h}</span>
+      </div>
+      <div class="pdf-shelf-prods">${prods}</div>
+    </div>`;
+  });
+  shelfHTML += '</div>';
+
+  // ── Slide 2: Position Table ──
+  let tableHTML = '<div class="pdf-tbl-wrap"><table class="pdf-tbl"><thead><tr>' +
+    '<th style="width:28px">#</th><th>Product</th>' +
+    '<th style="text-align:center;width:40px">Fac</th>' +
+    '<th style="text-align:center;width:44px">Units</th>' +
+    '</tr></thead><tbody>';
+  const unitMap = {0:10,1:10,2:10,3:8,4:8,5:6,6:6,7:4};
+  plan.rows.forEach((row, ri) => {
+    tableHTML += `<tr class="pdf-sec-row"><td colspan="4">
+      <span style="font-family:'DM Mono',monospace;">${row.id}</span>
+      &nbsp;·&nbsp;${row.h}&nbsp;·&nbsp;${row.slots.length} SKU
+    </td></tr>`;
+    row.slots.forEach((prod, si) => {
+      const col = _brandColor(prod);
+      tableHTML += `<tr>
+        <td style="font-weight:600;color:var(--gray-400);font-family:'DM Mono',monospace;">${si+1}</td>
+        <td><div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:${col};flex-shrink:0;"></div>
+          <span>${prod}</span>
+        </div></td>
+        <td style="text-align:center;color:var(--gray-600);">1</td>
+        <td style="text-align:center;color:var(--gray-600);">${unitMap[ri] || 4}</td>
+      </tr>`;
+    });
+  });
+  tableHTML += '</tbody></table></div>';
+
+  c.innerHTML = `<div class="pdf-viewer">
+    <div class="pdf-hdr">
+      <div>
+        <div class="pdf-hdr-title">${plan.id}</div>
+        <div class="pdf-hdr-sub">${plan.label}</div>
+      </div>
+      <div class="pdf-hdr-right">
+        <div class="pdf-hdr-meta">📄 ${plan.file}</div>
+        <div class="pdf-hdr-meta">${meta.date} · ${meta.time}</div>
+        <div class="pdf-hdr-meta">${plan.rows.length} rows · ${total} SKUs</div>
+      </div>
+    </div>
+    <div class="pdf-slides-wrap">
+      <div class="pdf-slide active" id="${vid}_s1">${shelfHTML}</div>
+      <div class="pdf-slide" id="${vid}_s2">${tableHTML}</div>
+    </div>
+    <div class="pdf-nav">
+      <button class="pdf-nav-btn" id="${vid}_prev" onclick="pdfNav('${vid}',-1)" disabled>← Shelf</button>
+      <div class="pdf-page-ind">
+        <span class="pdf-dot on" id="${vid}_d1"></span>
+        <span class="pdf-dot" id="${vid}_d2"></span>
+        <span id="${vid}_lbl" style="font-size:11px;color:var(--gray-500);">Shelf View</span>
+      </div>
+      <button class="pdf-nav-btn" id="${vid}_next" onclick="pdfNav('${vid}',1)">Table →</button>
+    </div>
+  </div>`;
+}
+
+function pdfNav(vid, dir) {
+  const cur = _pdfPages[vid] || 1;
+  const nxt = Math.max(1, Math.min(2, cur + dir));
+  if (nxt === cur) return;
+  document.getElementById(vid+'_s'+cur).classList.remove('active');
+  document.getElementById(vid+'_s'+nxt).classList.add('active');
+  _pdfPages[vid] = nxt;
+  document.getElementById(vid+'_prev').disabled = nxt === 1;
+  document.getElementById(vid+'_next').disabled = nxt === 2;
+  document.getElementById(vid+'_d1').className = 'pdf-dot' + (nxt===1?' on':'');
+  document.getElementById(vid+'_d2').className = 'pdf-dot' + (nxt===2?' on':'');
+  document.getElementById(vid+'_lbl').textContent = nxt===1 ? 'Shelf View' : 'Position Table';
+  document.getElementById(vid+'_prev').textContent = '← Shelf';
+  document.getElementById(vid+'_next').textContent = 'Table →';
+}
+
+// ═══════════════════════════════════
 //  CHECK WIZARD
 // ═══════════════════════════════════
 function updateWizard(n) {
@@ -1215,7 +1442,7 @@ function updateZonePreview() {
   selectedZoneKey = document.getElementById('zoneSelect').value;
   const plan = PLANS[selectedZoneKey];
   document.getElementById('zoneId').textContent = plan.id;
-  renderShelf('refPreview', selectedZoneKey, null, false);
+  renderPlanogramRef('refPreview', selectedZoneKey);
   const total = plan.rows.reduce((a,r)=>a+r.slots.length,0);
   document.getElementById('refMeta').innerHTML =
     `<span class="tag tag-blue">📄 ${plan.file}</span>
@@ -1394,7 +1621,7 @@ function renderResult() {
       <div class="grid-2">
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;">📄 Reference (planogram PDF)</div>
-          <div id="resultRef" style="max-height:320px;overflow-y:auto;"></div>
+          <div id="resultRef"></div>
         </div>
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;">📷 Actual shelf (AI detected)</div>
@@ -1419,7 +1646,7 @@ function renderResult() {
       <div class="code-block">${jsonPayload}</div>
     </div>
   `;
-  renderShelf('resultRef', selectedZoneKey, null, false);
+  renderPlanogramRef('resultRef', selectedZoneKey);
   renderShelf('resultActual', selectedZoneKey, result, true);
   const iList = document.getElementById('issuesList');
   result.issues.forEach(iss => {
