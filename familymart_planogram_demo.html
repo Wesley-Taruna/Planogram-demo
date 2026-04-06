@@ -444,6 +444,156 @@ code, .mono { font-family: 'DM Mono', monospace; }
 }
 .pdf-tbl tbody tr:not(.pdf-sec-row):hover td { background: var(--gray-50); }
 
+/* ── PDF DOCUMENT VIEW (Slide 3) ── */
+.pdf-doc-wrap {
+  background: #c8c8c8;
+  padding: 14px 10px;
+  overflow: auto;
+  max-height: 370px;
+}
+.pdf-page {
+  background: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+  width: 820px;
+  margin: 0 auto;
+  border: 1px solid #bbb;
+}
+.pdf-page-hdr {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  font-size: 10px;
+  color: #444;
+}
+.pdf-page-hdr-left {
+  width: 120px;
+  border-right: 1px solid #ccc;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-page-hdr-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #111;
+  border-right: 1px solid #ccc;
+}
+.pdf-page-hdr-right {
+  width: 160px;
+  padding: 6px 10px;
+  font-size: 9.5px;
+  line-height: 1.8;
+  color: #444;
+}
+.pdf-gondola {
+  display: flex;
+  padding: 12px 8px 4px;
+  gap: 0;
+  border: 1px solid #888;
+  margin: 14px 10px 10px;
+  background: #f5f3ef;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+}
+.pdf-col {
+  flex: 1;
+  border-right: 2px solid #999;
+  padding: 0 4px 4px;
+}
+.pdf-col:last-child { border-right: none; }
+.pdf-col-hdr {
+  font-size: 7.5px;
+  font-weight: 700;
+  text-align: center;
+  color: #555;
+  padding: 2px 0 4px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px dashed #bbb;
+  margin-bottom: 3px;
+}
+.pdf-gondola-row {
+  display: flex;
+  gap: 1.5px;
+  margin-bottom: 3px;
+  align-items: flex-end;
+  border-bottom: 2px solid #888;
+  padding-bottom: 2px;
+}
+.pdf-gondola-prod {
+  flex: 1;
+  border-radius: 2px;
+  padding: 2px 1px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid;
+}
+.pdf-gondola-prod-name {
+  font-size: 6px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+  hyphens: auto;
+}
+.pdf-row-tick {
+  writing-mode: vertical-rl;
+  font-size: 6px;
+  color: #888;
+  padding-right: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pdf-page-ftr {
+  border-top: 1px solid #ccc;
+  margin: 4px 10px 0;
+  font-size: 9px;
+  color: #555;
+}
+.pdf-page-ftr-title {
+  text-align: center;
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.pdf-page-ftr-sigs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.pdf-page-ftr-sig {
+  flex: 1;
+  border-right: 1px solid #ccc;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 8.5px;
+  color: #333;
+}
+.pdf-page-ftr-sig:last-child { border-right: none; }
+.pdf-page-ftr-blank {
+  display: flex;
+}
+.pdf-page-ftr-box {
+  flex: 1;
+  height: 32px;
+  border-right: 1px solid #ccc;
+}
+.pdf-page-ftr-box:last-child { border-right: none; }
+.pdf-fm-logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #00843D;
+}
+.pdf-fm-logo-stripe { width: 3px; height: 16px; background: #00843D; border-radius: 1px; }
+
 /* ── ANALYSIS STREAM ── */
 .stream-box {
   background: var(--gray-900);
@@ -1305,6 +1455,84 @@ function _shortProd(s) {
   return s.replace(/\s*\d+[gGxX][\w.]*$/, '').trim().replace(/(.{18}).*/, '$1…');
 }
 
+// Map each PDF file to its ordered zone keys
+const PDF_ZONES = {
+  'SNACK3C.pdf':   ['snack_1','snack_2','snack_3'],
+  'BISCUIT5H.pdf': ['biscuit_1','biscuit_2','biscuit_3','biscuit_5'],
+};
+// Short column labels as they appear in the Spaceman PDF
+const PDF_COL_LABELS = {
+  'SNACK3C.pdf':   ['COL 1','COL 2','COL 3'],
+  'BISCUIT5H.pdf': ['COL 1','COL 2','COL 3','COL 5'],
+};
+
+function buildPdfPageHTML(planFile, highlightKey) {
+  const meta = {
+    'SNACK3C.pdf':   { title:'SNACK3C',   date:'Date 01 April 2026', time:'Time 11:39:16', logo:true },
+    'BISCUIT5H.pdf': { title:'BISCUIT5H', date:'Date 17 Maret 2026', time:'Time 8:51:14',  logo:false },
+  }[planFile] || { title:planFile, date:'', time:'', logo:false };
+
+  const zoneKeys  = PDF_ZONES[planFile]  || [];
+  const colLabels = PDF_COL_LABELS[planFile] || [];
+
+  // Build columns HTML
+  let colsHTML = '';
+  zoneKeys.forEach((key, ci) => {
+    const p = PLANS[key];
+    const isHighlight = key === highlightKey;
+    const colBorder = isHighlight ? 'border:2px solid var(--green);border-radius:3px;' : '';
+    let rowsHTML = '';
+    p.rows.forEach(row => {
+      let prodsHTML = '';
+      row.slots.forEach(prod => {
+        const col = _brandColor(prod);
+        const shortBrand = prod.split(' ').slice(0,2).join('\n');
+        prodsHTML += `<div class="pdf-gondola-prod" style="border-color:${col}66;background:${col}18;">
+          <span class="pdf-gondola-prod-name" style="color:${col};">${shortBrand}</span>
+        </div>`;
+      });
+      rowsHTML += `<div class="pdf-gondola-row">
+        <span class="pdf-row-tick">${row.id}</span>
+        ${prodsHTML}
+      </div>`;
+    });
+    colsHTML += `<div class="pdf-col" style="${colBorder}">
+      <div class="pdf-col-hdr">${colLabels[ci] || ('COL '+(ci+1))}${isHighlight ? ' ◀ selected' : ''}</div>
+      ${rowsHTML}
+    </div>`;
+  });
+
+  const logoHTML = meta.logo
+    ? `<div class="pdf-fm-logo"><div class="pdf-fm-logo-stripe"></div>FamilyMart</div>`
+    : `<div style="font-size:9px;color:#888;">SPACEMAN</div>`;
+
+  return `<div class="pdf-doc-wrap">
+    <div class="pdf-page">
+      <div class="pdf-page-hdr">
+        <div class="pdf-page-hdr-left">${logoHTML}</div>
+        <div class="pdf-page-hdr-center">${meta.title}</div>
+        <div class="pdf-page-hdr-right">
+          ${meta.date}<br>${meta.time}
+        </div>
+      </div>
+      <div class="pdf-gondola">${colsHTML}</div>
+      <div class="pdf-page-ftr">
+        <div class="pdf-page-ftr-title">APPROVED BY:</div>
+        <div class="pdf-page-ftr-sigs">
+          <div class="pdf-page-ftr-sig">SPACEMAN</div>
+          <div class="pdf-page-ftr-sig">OPERATIONAL</div>
+          <div class="pdf-page-ftr-sig">MERCHANDISING</div>
+        </div>
+        <div class="pdf-page-ftr-blank">
+          <div class="pdf-page-ftr-box"></div>
+          <div class="pdf-page-ftr-box"></div>
+          <div class="pdf-page-ftr-box"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderPlanogramRef(containerId, planKey) {
   const c = document.getElementById(containerId);
   if (!c) return;
@@ -1338,6 +1566,9 @@ function renderPlanogramRef(containerId, planKey) {
     </div>`;
   });
   shelfHTML += '</div>';
+
+  // ── Slide 3: Full PDF Page ──
+  const fullPdfHTML = buildPdfPageHTML(plan.file, planKey);
 
   // ── Slide 2: Position Table ──
   let tableHTML = '<div class="pdf-tbl-wrap"><table class="pdf-tbl"><thead><tr>' +
@@ -1381,33 +1612,34 @@ function renderPlanogramRef(containerId, planKey) {
     <div class="pdf-slides-wrap">
       <div class="pdf-slide active" id="${vid}_s1">${shelfHTML}</div>
       <div class="pdf-slide" id="${vid}_s2">${tableHTML}</div>
+      <div class="pdf-slide" id="${vid}_s3">${fullPdfHTML}</div>
     </div>
     <div class="pdf-nav">
-      <button class="pdf-nav-btn" id="${vid}_prev" onclick="pdfNav('${vid}',-1)" disabled>← Shelf</button>
+      <button class="pdf-nav-btn" id="${vid}_prev" onclick="pdfNav('${vid}',-1)" disabled>‹ Prev</button>
       <div class="pdf-page-ind">
-        <span class="pdf-dot on" id="${vid}_d1"></span>
-        <span class="pdf-dot" id="${vid}_d2"></span>
+        <span class="pdf-dot on" id="${vid}_d1" title="Shelf View"></span>
+        <span class="pdf-dot" id="${vid}_d2" title="Position Table"></span>
+        <span class="pdf-dot" id="${vid}_d3" title="PDF Document"></span>
         <span id="${vid}_lbl" style="font-size:11px;color:var(--gray-500);">Shelf View</span>
       </div>
-      <button class="pdf-nav-btn" id="${vid}_next" onclick="pdfNav('${vid}',1)">Table →</button>
+      <button class="pdf-nav-btn" id="${vid}_next" onclick="pdfNav('${vid}',1)">Next ›</button>
     </div>
   </div>`;
 }
 
+const _slideLabels = ['Shelf View', 'Position Table', 'PDF Document'];
 function pdfNav(vid, dir) {
   const cur = _pdfPages[vid] || 1;
-  const nxt = Math.max(1, Math.min(2, cur + dir));
+  const nxt = Math.max(1, Math.min(3, cur + dir));
   if (nxt === cur) return;
   document.getElementById(vid+'_s'+cur).classList.remove('active');
   document.getElementById(vid+'_s'+nxt).classList.add('active');
   _pdfPages[vid] = nxt;
   document.getElementById(vid+'_prev').disabled = nxt === 1;
-  document.getElementById(vid+'_next').disabled = nxt === 2;
-  document.getElementById(vid+'_d1').className = 'pdf-dot' + (nxt===1?' on':'');
-  document.getElementById(vid+'_d2').className = 'pdf-dot' + (nxt===2?' on':'');
-  document.getElementById(vid+'_lbl').textContent = nxt===1 ? 'Shelf View' : 'Position Table';
-  document.getElementById(vid+'_prev').textContent = '← Shelf';
-  document.getElementById(vid+'_next').textContent = 'Table →';
+  document.getElementById(vid+'_next').disabled = nxt === 3;
+  for (let i = 1; i <= 3; i++)
+    document.getElementById(vid+'_d'+i).className = 'pdf-dot' + (nxt===i?' on':'');
+  document.getElementById(vid+'_lbl').textContent = _slideLabels[nxt-1];
 }
 
 // ═══════════════════════════════════
