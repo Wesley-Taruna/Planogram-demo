@@ -1,0 +1,11 @@
+{
+  "name": "familymart-planogram-demo",
+  "version": "1.0.0",
+  "description": "Demo for FamilyMart Planogram AI Engine",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/familymart_planogram_demo.html"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
